@@ -7,7 +7,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QPushButton,
     QSpinBox,
-    QComboBox)
+    QComboBox,
+    QTableWidget,
+    QTableWidgetItem)
 
 from PySide6.QtCore import Qt
 import sys
@@ -22,19 +24,50 @@ class BlankMainWindow(QMainWindow):
         central = QWidget(self)
         self.setCentralWidget(central)
 
-        # simple layout and label
-        layout = QVBoxLayout(central)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.addStretch()
-        layout.addStretch()
+        # main layout
+        main_layout = QVBoxLayout(central)
+        main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.setSpacing(10)
+
+        # task table
+        self.task_table = QTableWidget()
+        self.task_table.setColumnCount(3)
+        self.task_table.horizontalHeader().setVisible(False) # might end up using this for labels
+        main_layout.addWidget(self.task_table)
+
+        main_layout.addStretch()
+
+        button_layout = QHBoxLayout()
+
+        # create buttons
+        self.add_button = QPushButton("Add+")
+        self.remove_button = QPushButton("Remove-")
+        self.edit_button = QPushButton("Edit")
+        
+        # Button styling
+        button_style = """
+            background-color: #FFFFFF;
+            color: black;
+            border: 1px solid #CCCCCC;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+        """
+        self.add_button.setStyleSheet(button_style)
+        self.remove_button.setStyleSheet(button_style)
+        self.edit_button.setStyleSheet(button_style)
+        
+        button_layout.addWidget(self.add_button)
+        button_layout.addWidget(self.remove_button)
+        button_layout.addWidget(self.edit_button)
+
+        main_layout.addLayout(button_layout)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Date Selector")
         self.setFixedSize(400, 200)
-        
-        # Central widget
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
         
@@ -43,7 +76,6 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
         
-        # date inputs area
         inputs_layout = QHBoxLayout()
         # year input
         year_layout = QVBoxLayout()
@@ -77,8 +109,6 @@ class MainWindow(QMainWindow):
 
         # pushes buttons to bottom
         main_layout.addStretch()
-        
-        # Button layout
         button_layout = QHBoxLayout()
         
         # push buttons to the right
@@ -89,8 +119,6 @@ class MainWindow(QMainWindow):
         self.select_button = QPushButton("Select")
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.select_button)
-        
-        # Add button layout to main layout
         main_layout.addLayout(button_layout)
 
         self.cancel_button.clicked.connect(self.close)
@@ -105,7 +133,7 @@ class MainWindow(QMainWindow):
         day = self.day_input.value()
         self.selected_date = (year, month, day)
 
-        # open blank main gui
+        # open main gui
         self.main_window = BlankMainWindow()
         self.main_window.show()
         self.close()
