@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem)
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontDatabase, QFont
 import sys
 
 class BlankMainWindow(QMainWindow):
@@ -140,5 +141,11 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    
+    # font
+    QFontDatabase.addApplicationFont("Knewave")
+    font = QFont("Knewave")
+    app.setFont(font)
+    
     window = MainWindow()
     sys.exit(app.exec())
