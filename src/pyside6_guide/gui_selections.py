@@ -9,14 +9,16 @@ from PySide6.QtWidgets import (
     QSpinBox,
     QComboBox,
     QTableWidget,
-    QTableWidgetItem)
+    QTableWidgetItem,
+    QCheckBox,
+    QHeaderView)
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontDatabase, QFont
 import sys
 
 class BlankMainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, selected_date):
         super().__init__()
         self.setWindowTitle("Main GUI")
         self.setFixedSize(600, 400)
@@ -30,10 +32,23 @@ class BlankMainWindow(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
 
+        # date display
+        top_layout = QHBoxLayout()
+        top_layout.addStretch()
+        year, month, day = selected_date
+        months = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"]
+        date_text = f"{months[month - 1]} {day}, {year}"
+        date_label = QLabel(date_text)
+        top_layout.addWidget(date_label)
+        main_layout.addLayout(top_layout)
+
         # task table
         self.task_table = QTableWidget()
         self.task_table.setColumnCount(3)
         self.task_table.horizontalHeader().setVisible(False) # might end up using this for labels
+        self.task_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.task_table.resizeRowsToContents()
         main_layout.addWidget(self.task_table)
 
         main_layout.addStretch()
@@ -58,11 +73,43 @@ class BlankMainWindow(QMainWindow):
         self.remove_button.setStyleSheet(button_style)
         self.edit_button.setStyleSheet(button_style)
         
+        self.add_button.clicked.connect(self.add_task)
+        
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.remove_button)
         button_layout.addWidget(self.edit_button)
 
         main_layout.addLayout(button_layout)
+
+    def add_task(self):
+        # add row to table
+        row = self.task_table.rowCount()
+        self.task_table.insertRow(row)
+
+        # checkbox
+        checkbox = QCheckBox()
+        self.task_table.setCellWidget(row, 0, checkbox)
+
+        # task name
+        name_item = QTableWidgetItem("Name: ")
+        name_item.setFlags(name_item.flags() | Qt.ItemIsEditable)
+        self.task_table.setItem(row, 1, name_item)
+
+        # time dropdown
+        time_combo = QComboBox()
+        times = ["12:00 AM", "12:30 AM", "1:00 AM", "1:30 AM", "2:00 AM", "2:30 AM",
+                 "3:00 AM", "3:30 AM", "4:00 AM", "4:30 AM", "5:00 AM", "5:30 AM",
+                 "6:00 AM", "6:30 AM", "7:00 AM", "7:30 AM", "8:00 AM", "8:30 AM",
+                 "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+                 "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM",
+                 "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM",
+                 "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM",
+                 "9:00 PM", "9:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"]
+        time_combo.addItems(times)
+        self.task_table.setCellWidget(row, 2, time_combo)
+
+        # resize rows
+        self.task_table.resizeRowsToContents()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -82,7 +129,7 @@ class MainWindow(QMainWindow):
         year_layout = QVBoxLayout()
         year_layout.addWidget(QLabel("Year:"))
         self.year_input = QSpinBox()
-        self.year_input.setRange(2000, 2100)
+        self.year_input.setRange(2000, 2100) # range of years
         self.year_input.setValue(2026) # Default
         year_layout.addWidget(self.year_input)
         inputs_layout.addLayout(year_layout)
@@ -101,8 +148,8 @@ class MainWindow(QMainWindow):
         day_layout = QVBoxLayout()
         day_layout.addWidget(QLabel("Day:"))
         self.day_input = QSpinBox()
-        self.day_input.setRange(1, 31) 
-        self.day_input.setValue(1)
+        self.day_input.setRange(1, 31) # ranges of days
+        self.day_input.setValue(1) # default
         day_layout.addWidget(self.day_input)
         inputs_layout.addLayout(day_layout)
 
@@ -135,7 +182,7 @@ class MainWindow(QMainWindow):
         self.selected_date = (year, month, day)
 
         # open main gui
-        self.main_window = BlankMainWindow()
+        self.main_window = BlankMainWindow(self.selected_date)
         self.main_window.show()
         self.close()
 
