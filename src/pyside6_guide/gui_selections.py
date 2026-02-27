@@ -45,7 +45,7 @@ class BlankMainWindow(QMainWindow):
 
         # task table
         self.task_table = QTableWidget()
-        self.task_table.setColumnCount(3)
+        self.task_table.setColumnCount(4)
         self.task_table.horizontalHeader().setVisible(False) # might end up using this for labels
         self.task_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.task_table.resizeRowsToContents()
@@ -57,8 +57,6 @@ class BlankMainWindow(QMainWindow):
 
         # create buttons
         self.add_button = QPushButton("Add+")
-        self.remove_button = QPushButton("Remove-")
-        self.edit_button = QPushButton("Edit")
         
         # Button styling
         button_style = """
@@ -70,19 +68,15 @@ class BlankMainWindow(QMainWindow):
             border-radius: 5px;
         """
         self.add_button.setStyleSheet(button_style)
-        self.remove_button.setStyleSheet(button_style)
-        self.edit_button.setStyleSheet(button_style)
         
         self.add_button.clicked.connect(self.add_task)
         
         button_layout.addWidget(self.add_button)
-        button_layout.addWidget(self.remove_button)
-        button_layout.addWidget(self.edit_button)
 
         main_layout.addLayout(button_layout)
 
     def add_task(self):
-        # add row to table
+        # adds row to table
         row = self.task_table.rowCount()
         self.task_table.insertRow(row)
 
@@ -108,8 +102,18 @@ class BlankMainWindow(QMainWindow):
         time_combo.addItems(times)
         self.task_table.setCellWidget(row, 2, time_combo)
 
+        # remove button
+        remove_btn = QPushButton("X")
+        remove_btn.setFixedWidth(30)
+        remove_btn.clicked.connect(lambda: self.remove_task(row))
+        self.task_table.setCellWidget(row, 3, remove_btn)
+
         # resize rows
         self.task_table.resizeRowsToContents()
+
+    def remove_task(self, row):
+        # remove row
+        self.task_table.removeRow(row)
 
 class MainWindow(QMainWindow):
     def __init__(self):
